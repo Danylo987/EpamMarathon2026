@@ -1188,17 +1188,35 @@ Response: 200 OK
 ```
 
 ### `GET` /guest/groups/{groupReservationId}/sessions
-Response: 200 OK
+Owner-only. Requires a valid Cognito bearer token.
+
+Response: `200 OK`
 ```json
-[
-  {
-    "id": "string",
-    "groupReservationId": "string",
-    "guestName": "string",
-    "status": "string"
-  }
-]
+{
+  "participants": [
+    {
+      "id": "session1",
+      "type": "Guest",
+      "name": "Andrii",
+      "items": [
+        {
+          "dish": {
+            "id": "dish1",
+            "name": "Caesar Salad",
+            "price": 180
+          },
+          "quantity": 2
+        }
+      ],
+      "total": 360,
+      "isSubmitted": true
+    }
+  ],
+  "total": 360
+}
 ```
+
+Returns `401 Unauthorized` when the identity is missing, `403 Forbidden` when the caller is not the reservation owner, or `404 Not Found` when the group reservation does not exist.
 
 ### `DELETE` /guest/groups/{groupReservationId}/sessions/{guestSessionId}
 Response: 200 OK

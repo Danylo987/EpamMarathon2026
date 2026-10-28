@@ -171,7 +171,12 @@ public class GuestSessionService(
         };
     }
 
-    
+    public async Task<GetAllSessionsResponse> GetGroupReservationSessionsAsync(string userId, string groupReservationId)
+    {
+        await ValidateReservationOwnerAsync(groupReservationId, userId);
+        return await GetGroupReservationSessionsResponseAsync(groupReservationId);
+    }
+
     public async Task<GetAllSessionsResponse> DeleteGuestSessionAsync(string userId, string groupReservationId, string guestSessionId)
     {
         await ValidateReservationOwnerAsync(groupReservationId, userId);
@@ -186,6 +191,11 @@ public class GuestSessionService(
 
         await guestSessionRepository.DeleteAsync(session);
 
+        return await GetGroupReservationSessionsResponseAsync(groupReservationId);
+    }
+
+    private async Task<GetAllSessionsResponse> GetGroupReservationSessionsResponseAsync(string groupReservationId)
+    {
         var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
 
         var dishIds = sessions
@@ -208,7 +218,15 @@ public class GuestSessionService(
             }).ToArray();
 
             decimal total = items.Sum(i => i.Quantity * i.Dish.Price);
-            var participant = new Participant(guestSession.Id, ParticipantType.Guest, guestSession.GuestName, items, total, guestSession.IsSubmitted);
+            string name = guestSession.GuestName;
+            if (guestSession.IsOwnerSession && !string.IsNullOrEmpty(guestSession.OwnerUserId))
+            {
+                var owner = await userRepository.GetUserByIdAsync(guestSession.OwnerUserId);
+                name = owner?.Attributes.FirstOrDefault(a => a.Name == "given_name")?.Value ?? name;
+            }
+
+            var type = guestSession.IsOwnerSession ? ParticipantType.Owner : ParticipantType.Guest;
+            var participant = new Participant(guestSession.Id, type, name, items, total, guestSession.IsSubmitted);
             participants.Add(participant);
         }
 
@@ -357,7 +375,6 @@ public class GuestSessionService(
     }
 
 }
-
 
 
 

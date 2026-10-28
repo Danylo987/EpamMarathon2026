@@ -964,6 +964,23 @@
           "enable_proxy": true
         }
       },
+      "/guest/groups/{groupReservationId}/sessions": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
       "/guest/groups/{groupReservationId}/sessions/{guestSessionId}": {
         "enable_cors": {
           "state": true
@@ -1072,9 +1089,7 @@
       "cognito_authorizer": {
         "type": "COGNITO_USER_POOLS",
         "identity_source": "method.request.header.Authorization",
-        "user_pools": [
-          "${user_pool_name}"
-        ]
+        "user_pools": ["${user_pool_name}"]
       }
     }
   },
@@ -1308,12 +1323,8 @@
           "Sid": "WebSiteHostingGetObject",
           "Effect": "Allow",
           "Principal": "*",
-          "Action": [
-            "s3:GetObject"
-          ],
-          "Resource": [
-            "arn:aws:s3:::${swagger_ui_hoster_bucket_name}/*"
-          ]
+          "Action": ["s3:GetObject"],
+          "Resource": ["arn:aws:s3:::${swagger_ui_hoster_bucket_name}/*"]
         }
       ]
     },
@@ -1331,7 +1342,3 @@
     }
   }
 }
-
-
-
-

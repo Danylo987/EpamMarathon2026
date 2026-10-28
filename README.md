@@ -37,8 +37,7 @@ Replace variables with your **AWS account ID** and **Email**
 - `infra/terraform/backend.tf` - replace the Terraform state bucket name
 - `infra/terraform/variables.tf` - replace the default `account_id` and `alert_emails`
 
-
-Before running `terraform init`, create the Terraform state bucket with AWS CLI if it does not already exist. 
+Before running `terraform init`, create the Terraform state bucket with AWS CLI if it does not already exist.
 Get your AWS account ID from the CLI first:
 
 Windows PowerShell:
@@ -55,6 +54,7 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 
 You can use AWS Console interface
 AWS Management Console equivalent:
+
 - Go to **S3** → **Create bucket** and use the bucket name **restaurant-terraform-state-$ACCOUNT_ID**
 - Turn on **Versioning** in the bucket properties
 - Leave **Block all public access** enabled
@@ -100,6 +100,7 @@ aws s3api put-public-access-block \
 ```
 
 ### After bucket creation
+
 ```bash
 cd ../../infra/terraform
 terraform init
@@ -116,6 +117,7 @@ The backend app is deployed from `backend/restaurant-backend-app`.
 Before deploying, verify the Syndicate config files:
 edit syndicate.yml → set project_path to your local absolute path to backend/restaurant-backend-app
 Replace bucket names with your AWS account ID
+
 - `.syndicate-config-restaurant-backend-app/syndicate.yml`
 - `.syndicate-config-restaurant-backend-app/syndicate_aliases.yml`
 
