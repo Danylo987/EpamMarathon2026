@@ -189,6 +189,11 @@ public class GuestSessionService(
             throw new ValidationException("Guest session does not belong to this group reservation.");
         }
 
+        if (session.IsOwnerSession)
+        {
+            throw new ValidationException("The reservation owner's session cannot be deleted.");
+        }
+
         await guestSessionRepository.DeleteAsync(session);
 
         return await GetGroupReservationSessionsResponseAsync(groupReservationId);
@@ -256,9 +261,8 @@ public class GuestSessionService(
     {
         var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
 
-        // Owner is always 1 active participant. 
-        // If sessions is null/empty, it safely evaluates to 0 joined guests + 1 owner = 1.
-        return (sessions?.Count ?? 0) + 1;
+        int guestCount = sessions?.Count(session => !session.IsOwnerSession) ?? 0;
+        return guestCount + 1;
     }
 
     private async Task ValidateGroupReservationId(string groupReservationId) => await GetGroupReservationAndValidateAsync(groupReservationId);
@@ -326,7 +330,26 @@ public class GuestSessionService(
         }
     }
 
-    public async Task CreateGroupOwnerSessionAsync(string userId, string groupReservationId)
+    public async Task<string> GetOwnerGuestSessionIdAsync(string userId, string reservationId)
+    {
+        var reservation = await reservationRepository.GetReservationByIdAsync(reservationId)
+            ?? throw new ReservationNotFoundException($"Reservation with ID {reservationId} not found.");
+
+        if (!string.Equals(reservation.CustomerId, userId, StringComparison.OrdinalIgnoreCase))
+            throw new ActionForbiddenException("Only the reservation owner can perform this action.");
+
+        var groupReservation = await groupReservationRepository.GetByReservationIdAsync(reservationId)
+            ?? throw new GroupReservationNotFoundException();
+
+        var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservation.GroupReservationId);
+        var ownerSession = sessions.FirstOrDefault(session =>
+            session.IsOwnerSession &&
+            string.Equals(session.OwnerUserId, userId, StringComparison.OrdinalIgnoreCase));
+
+        return ownerSession?.Id ?? await CreateGroupOwnerSessionAsync(userId, groupReservation.GroupReservationId);
+    }
+
+    public async Task<string> CreateGroupOwnerSessionAsync(string userId, string groupReservationId)
     {
         var session = new GuestSession()
         {
@@ -339,6 +362,7 @@ public class GuestSessionService(
         };
 
         await guestSessionRepository.SaveAsync(session);
+        return session.Id;
     }
 
     public async Task<GetGuestSessionResponse> GetGuestSessionInfoAsync(string guestSessionId)
@@ -375,6 +399,4 @@ public class GuestSessionService(
     }
 
 }
-
-
 

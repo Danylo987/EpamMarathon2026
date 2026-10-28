@@ -30,7 +30,8 @@ public class DeleteGuestSessionHandler : IApiRequestHandler
         }
 
         if (request.RequestContext?.Authorizer?.Claims == null ||
-            !request.RequestContext.Authorizer.Claims.TryGetValue("sub", out var userId))
+            !request.RequestContext.Authorizer.Claims.TryGetValue("sub", out var userId) ||
+            string.IsNullOrWhiteSpace(userId))
         {
             return ResponseBuilder.CreateErrorResponse(401, "Unauthorized.", context.Logger);
         }
@@ -38,7 +39,7 @@ public class DeleteGuestSessionHandler : IApiRequestHandler
         try
         {
             var updatedSnapshot = await _guestSessionService.DeleteGuestSessionAsync(userId, groupReservationId, guestSessionId);
-            return ResponseBuilder.CreateSuccessResponse(updatedSnapshot);
+            return ResponseBuilder.CreateJsonResponse(200, updatedSnapshot);
         }
         catch (GroupReservationNotFoundException ex)
         {

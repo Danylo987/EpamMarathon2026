@@ -167,6 +167,7 @@ public static class RouteRegistry
             new RouteHandler(new Route(HttpMethods.POST, "/reservations"), ActivatorUtilities.CreateInstance<CreateReservationHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/reservations"), ActivatorUtilities.CreateInstance<GetReservationsForUserHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}"), ActivatorUtilities.CreateInstance<GetReservationByIdHandler>(provider)),
+            new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}/guest-session-id"), ActivatorUtilities.CreateInstance<GetOwnerGuestSessionIdHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.PATCH, "/reservations/{reservationId}/status"), ActivatorUtilities.CreateInstance<UpdateReservationStatusHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}/feedback"), ActivatorUtilities.CreateInstance<GetFeedbackForReservationHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.DELETE, "/reservations"), ActivatorUtilities.CreateInstance<CancelReservationHandler>(provider)),
@@ -195,6 +196,7 @@ public static class RouteRegistry
             new RouteHandler(new Route(HttpMethods.GET, "/guest/groups/{groupReservationId}/sessions"), ActivatorUtilities.CreateInstance<GetGroupReservationSessionsHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/guest/invites/{token}"), ActivatorUtilities.CreateInstance<GetGroupReservationHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.GET, "/reservations/{reservationId}/invite-token"), ActivatorUtilities.CreateInstance<GetInviteTokenHandler>(provider)),
+            new RouteHandler(new Route(HttpMethods.POST, "/group-reservations/{groupReservationId}/submit"), ActivatorUtilities.CreateInstance<SubmitGroupPreOrderHandler>(provider)),
             new RouteHandler(new Route(HttpMethods.DELETE, "/guest/groups/{groupReservationId}/sessions/{guestSessionId}"), ActivatorUtilities.CreateInstance<DeleteGuestSessionHandler>(provider))
         ];
         List<RouteHandler> GetAuxiliaryRoutes() => [
@@ -219,5 +221,4 @@ public static class RouteRegistry
         return allRoutes;
     }
 }
-
 

@@ -555,13 +555,16 @@ Response: `200 OK`
 ```
 
 ### `GET` /reservations/{reservationId}/guest-session-id
+Owner-only. Requires a valid Cognito bearer token.
+
 Response: `200 OK`
 ```json
 {
-  "guestSessionId": "string"
+  "guestSessionId": "owner-session-123"
 }
 ```
 
+Returns `401 Unauthorized` when the identity is missing, `403 Forbidden` when the caller is not the reservation owner, or `404 Not Found` when the reservation or group reservation does not exist.
 
 ### `DELETE` /reservations
 Request body:
@@ -1180,12 +1183,30 @@ Response: 200 OK
 ```
 
 ### `POST` /group-reservations/{groupReservationId}/submit
-Response: 200 OK
+Request body:
 ```json
 {
-  "message": "Group reservation pre-order submitted successfully."
+  "reservationId": "reservation-123"
 }
 ```
+
+Owner-only. Submits only submitted guest sessions, consolidates quantities by dish ID, updates the order to `SubmittedByCustomer`, and marks the group reservation as `Submitted`.
+
+Response: `200 OK`
+```json
+[
+  {
+    "dishId": "dish1",
+    "quantity": 3
+  },
+  {
+    "dishId": "dish2",
+    "quantity": 2
+  }
+]
+```
+
+Returns `400 Bad Request` when there are no submitted sessions, no dishes in submitted sessions, or no order for the reservation; `401 Unauthorized` when the identity is missing; `403 Forbidden` when the caller is not the reservation owner; or `404 Not Found` when the reservation or group reservation does not exist.
 
 ### `GET` /guest/groups/{groupReservationId}/sessions
 Owner-only. Requires a valid Cognito bearer token.
@@ -1219,9 +1240,32 @@ Response: `200 OK`
 Returns `401 Unauthorized` when the identity is missing, `403 Forbidden` when the caller is not the reservation owner, or `404 Not Found` when the group reservation does not exist.
 
 ### `DELETE` /guest/groups/{groupReservationId}/sessions/{guestSessionId}
-Response: 200 OK
+Owner-only. Removes a guest session from the group and returns the updated participant snapshot and group total.
+
+Response: `200 OK`
 ```json
 {
-  "message": "Guest session removed from group successfully."
+  "participants": [
+    {
+      "id": "session2",
+      "type": "Guest",
+      "name": "Olena",
+      "items": [
+        {
+          "dish": {
+            "id": "dish2",
+            "name": "Tom Yum",
+            "price": 220
+          },
+          "quantity": 1
+        }
+      ],
+      "total": 220,
+      "isSubmitted": false
+    }
+  ],
+  "total": 220
 }
 ```
+
+Returns `400 Bad Request` when the session does not belong to the group, `401 Unauthorized` when the identity is missing, `403 Forbidden` when the caller is not the reservation owner, or `404 Not Found` when the group reservation or session does not exist.

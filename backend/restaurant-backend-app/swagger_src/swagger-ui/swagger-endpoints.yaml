@@ -157,7 +157,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /guest/groups/{groupReservationId}/submit:
+  /group-reservations/{groupReservationId}/submit:
     post:
       tags:
         - Group Reservations
@@ -171,6 +171,8 @@ paths:
           description: The ID of the group reservation
           schema:
             type: string
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -186,9 +188,34 @@ paths:
                 type: array
                 items:
                   type: object
-                  description: Enriched dishes data
+                  required:
+                    - dishId
+                    - quantity
+                  properties:
+                    dishId:
+                      type: string
+                    quantity:
+                      type: integer
         '400':
           description: Invalid request - missing parameters or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid owner identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Caller is not the reservation owner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Group reservation or reservation not found
           content:
             application/json:
               schema:
@@ -269,6 +296,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Reservation not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Caller is not the reservation owner
           content:
             application/json:
               schema:
@@ -435,6 +468,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid owner identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
         '404':
           description: Reservation not found
           content:
@@ -447,7 +486,7 @@ paths:
       tags:
         - Guest Sessions
       summary: Delete guest session
-      description: Deletes a guest session from a group reservation
+      description: Owner-only. Deletes a guest session and returns the updated group snapshot.
       operationId: deleteGuestSession
       parameters:
         - name: groupReservationId
@@ -471,7 +510,39 @@ paths:
             application/json:
               schema:
                 type: object
-                description: Updated snapshot of the group reservation
+                required:
+                  - participants
+                  - total
+                properties:
+                  participants:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - type
+                        - name
+                        - items
+                        - total
+                        - isSubmitted
+                      properties:
+                        id:
+                          type: string
+                        type:
+                          type: string
+                          enum: [Owner, Guest]
+                        name:
+                          type: string
+                        items:
+                          type: array
+                          items:
+                            type: object
+                        total:
+                          type: number
+                        isSubmitted:
+                          type: boolean
+                  total:
+                    type: number
         '400':
           description: Invalid request - missing required path parameters
           content:
@@ -480,6 +551,12 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Caller is not the reservation owner
           content:
             application/json:
               schema:
@@ -516,6 +593,18 @@ paths:
                 $ref: '#/components/schemas/GetOwnerSessionIdResponse'
         '400':
           description: Invalid request or validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Missing or invalid owner identity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Caller is not the reservation owner
           content:
             application/json:
               schema:
