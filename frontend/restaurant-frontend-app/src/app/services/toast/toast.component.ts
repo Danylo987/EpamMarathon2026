@@ -10,7 +10,7 @@ export interface ToastData {
 @Component({
   selector: 'app-toast',
   template: `
-    <div class="toast-content">
+    <div class="toast-content" [class.has-title]="data.title">
       @if (data.type === 'success') {
         <img src="assets/svg/check-circle.svg" alt="" class="toast-icon" />
       }

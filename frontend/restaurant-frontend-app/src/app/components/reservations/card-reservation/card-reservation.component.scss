@@ -1,6 +1,7 @@
 @use 'app/shared/styles/abstracts/colors' as color;
 
 .card {
+  position: relative;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -12,6 +13,43 @@
   background-color: color.$neutral-0;
   border-radius: 1.5rem;
   box-shadow: 0 0 10px 4px color.$shadow;
+
+  .status-banner {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 32px;
+    min-height: 32px;
+    margin: -24px 0 8px;
+    padding: 4px 18px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    color: color.$neutral-900;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 24px;
+
+    &.reserved {
+      background: color.$blue-100;
+    }
+
+    &.completed {
+      background: color.$green-100;
+    }
+
+    &.in-progress {
+      background: color.$blue-100;
+    }
+
+    &.finished {
+      background: color.$neutral-100;
+    }
+
+    &.canceled {
+      background: color.$red-100;
+    }
+  }
 
   .details-line {
     display: flex;
@@ -34,41 +72,112 @@
       }
     }
 
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+  }
+}
 
-      width: 78px;
-      min-height: 1.5rem;
-      padding: 0 0.5rem;
+.customer-card {
+  width: 100%;
+  max-width: 100%;
+  height: 254px;
+  gap: 16px;
+  padding: 48px 24px 24px;
 
-      color: color.$neutral-900;
-      background-color: color.$neutral-100;
-      border-radius: 1rem;
+  .status-banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+  }
 
-      font-size: 0.875rem;
-      font-weight: 400;
-      line-height: 1rem;
+  .details-wrapper {
+    min-height: 0;
+    gap: 8px;
+  }
 
-      &.reserved {
-        background-color: color.$orange-100;
-      }
+  .actions {
+    margin: auto 0 0 auto;
+    padding-left: 44px;
+  }
+}
 
-      &.in-progress {
-        background-color: color.$blue-100;
-      }
+.cancel-reservation-icon {
+  position: absolute;
+  bottom: 32px;
+  left: 16px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
 
-      &.finished {
-        color: color.$neutral-900;
-        background-color: color.$neutral-100;
-      }
+  &:hover {
+    background: transparent;
+  }
 
-      &.canceled {
-        color: color.$neutral-600;
-        background-color: color.$neutral-200;
-      }
-    }
+  &:focus-visible {
+    outline: 2px solid color.$orange-400;
+    outline-offset: 2px;
+  }
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.cancel-reservation-message {
+  margin: 0;
+  color: color.$neutral-900;
+}
+
+.cancel-reservation-actions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  column-gap: 0;
+  row-gap: 16px;
+
+  button + button {
+    margin-left: 24px;
+  }
+}
+
+.edit-reservation-icon {
+  position: absolute;
+  bottom: 32px;
+  left: 48px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: color.$neutral-900;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid color.$orange-400;
+    outline-offset: 2px;
+  }
+
+  svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 }
 

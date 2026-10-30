@@ -98,9 +98,17 @@ export class CardReservationComponent {
   readonly preOrder = output<CreateOrderRequest>();
   readonly showWaiterOrderModal = signal(false);
   readonly showGroupOrderModal = signal(false);
+  readonly showCancelReservationDialog = signal(false);
 
   readonly statusView = computed<ReservationStatusView>(() => {
     const reservation = this.r();
+
+    if (
+      reservation.hasSubmittedPreOrder &&
+      reservation.status !== ReservationStatusCustomer.Cancelled
+    ) {
+      return { class: 'completed', label: 'Completed' };
+    }
 
     return (
       this.statusEnum()[reservation.status] ?? {
@@ -199,6 +207,19 @@ export class CardReservationComponent {
 
   closeGroupOrderModal(): void {
     this.showGroupOrderModal.set(false);
+  }
+
+  openCancelReservationDialog(): void {
+    this.showCancelReservationDialog.set(true);
+  }
+
+  closeCancelReservationDialog(): void {
+    this.showCancelReservationDialog.set(false);
+  }
+
+  confirmCancelReservation(): void {
+    this.cancelReservation.emit(this.r().id);
+    this.closeCancelReservationDialog();
   }
 
   onWaiterOrderCreated(order: CreateOrderRequest): void {

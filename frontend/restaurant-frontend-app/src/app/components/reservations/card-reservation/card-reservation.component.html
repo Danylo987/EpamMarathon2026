@@ -1,4 +1,41 @@
-<li class="card">
+<li class="card" [class.customer-card]="role() === Roles.CUSTOMER">
+  @if (
+    r().status === ReservationStatusCustomer.Reserved ||
+    r().status === ReservationStatusCustomer.InProgress
+  ) {
+    <button
+      type="button"
+      class="cancel-reservation-icon"
+      aria-label="Cancel reservation"
+      (click)="openCancelReservationDialog()"
+    >
+      <img src="assets/svg/trash.svg" alt="" aria-hidden="true" />
+    </button>
+  }
+
+  @if (
+    role() === Roles.CUSTOMER &&
+    r().status === ReservationStatusCustomer.Reserved
+  ) {
+    <button
+      type="button"
+      class="edit-reservation-icon"
+      aria-label="Edit reservation"
+      (click)="editReservation.emit(r())"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M3 17.25V21h3.75L19.81 7.94l-3.75-3.75L3 17.25Z" />
+        <path d="m14.94 5.06 3.75 3.75M3 21l4.5-1.5" />
+      </svg>
+    </button>
+  }
+
+  @if (role() === Roles.CUSTOMER) {
+    <span [class]="'status-banner ' + statusView().class">
+      {{ statusView().label }}
+    </span>
+  }
+
   <div class="details-wrapper">
     <div class="details-line with-table">
       <div class="details">
@@ -25,13 +62,6 @@
         </div>
       }
 
-      @if (role() === Roles.CUSTOMER) {
-        <span
-          [class]="'status-badge ' + statusView().class"
-        >
-          {{ statusView().label }}
-        </span>
-      }
     </div>
 
     <div class="details-line">
@@ -125,24 +155,6 @@
   <div class="actions">
     @switch (r().status) {
       @case (ReservationStatusCustomer.Reserved) {
-        <button
-          type="button"
-          class="button button--tertiary button--large"
-          (click)="cancelReservation.emit(r().id)"
-        >
-          Cancel
-        </button>
-
-        @if (role() === Roles.CUSTOMER) {
-          <button
-            type="button"
-            class="button button--secondary button--large"
-            (click)="editReservation.emit(r())"
-          >
-            Edit
-          </button>
-        }
-
         @if (role() === Roles.WAITER) {
           <button
             type="button"
@@ -173,14 +185,6 @@
       }
 
       @case (ReservationStatusCustomer.InProgress) {
-        <button
-          type="button"
-          class="button button--tertiary button--large"
-          (click)="cancelReservation.emit(r().id)"
-        >
-          Cancel
-        </button>
-
         @if (
           role() === Roles.WAITER &&
           canOpenWaiterPreOrder()
@@ -323,5 +327,32 @@
       [modalMode]="true"
       (closeRequested)="closeGroupOrderModal()"
     />
+  </app-modal>
+}
+
+@if (showCancelReservationDialog()) {
+  <app-modal
+    title="Cancel Reservation?"
+    (closed)="closeCancelReservationDialog()"
+  >
+    <p class="cancel-reservation-message">
+      Are you sure you want to cancel this reservation? This action cannot be undone.
+    </p>
+    <div modal-actions class="cancel-reservation-actions">
+      <button
+        type="button"
+        class="button button--secondary button--large"
+        (click)="closeCancelReservationDialog()"
+      >
+        Keep Reservation
+      </button>
+      <button
+        type="button"
+        class="button button--primary button--large"
+        (click)="confirmCancelReservation()"
+      >
+        Yes, Cancel
+      </button>
+    </div>
   </app-modal>
 }

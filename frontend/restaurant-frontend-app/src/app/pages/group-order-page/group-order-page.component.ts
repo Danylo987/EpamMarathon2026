@@ -174,6 +174,7 @@ export class GroupOrderPageComponent implements OnInit {
           this.selectedGuest.set(null);
           this.updatedAt.set(new Date());
           this.refreshError.set(false);
+          this.toast.success('Guest Removed');
         },
         error: () => this.removeError.set(true),
       });
