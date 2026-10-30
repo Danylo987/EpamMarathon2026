@@ -308,6 +308,7 @@
   <app-modal
     title=""
     [width]="'1000px'"
+    [transparent]="true"
     (closed)="closeGroupOrderModal()"
   >
     <app-group-order-page
@@ -320,6 +321,7 @@
         endTime: r().endTime
       }"
       [modalMode]="true"
+      (closeRequested)="closeGroupOrderModal()"
     />
   </app-modal>
 }

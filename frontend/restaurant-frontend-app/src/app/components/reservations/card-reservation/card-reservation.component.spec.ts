@@ -80,6 +80,8 @@ describe('CardReservationComponent', () => {
 
     expect(fixture.nativeElement.querySelector('app-group-order-page')).not.toBeNull();
     expect(fixture.nativeElement.textContent).toContain('Group Pre-Order');
+    expect(fixture.nativeElement.textContent).toContain('Updated at');
+    expect(fixture.nativeElement.textContent).toContain('Refresh');
     expect(groupOrdersService.getGroupInvite$).not.toHaveBeenCalled();
     expect(groupOrdersService.getSessions$).toHaveBeenCalledWith('group-1');
     expect(groupOrdersService.getStatus$).toHaveBeenCalledWith('group-1');

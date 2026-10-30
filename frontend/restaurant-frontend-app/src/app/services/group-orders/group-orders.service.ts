@@ -67,7 +67,8 @@ export class GroupOrdersService {
   submit$(groupReservationId: string, reservationId: string): Observable<SubmittedDish[]> {
     return this.http.post<SubmittedDish[]>(
       `${this.baseUrl}/group-reservations/${encodeURIComponent(groupReservationId)}/submit`,
-      { reservationId }
+      { reservationId },
+      { context: new HttpContext().set(SKIP_ERROR_TOAST, true) },
     );
   }
 

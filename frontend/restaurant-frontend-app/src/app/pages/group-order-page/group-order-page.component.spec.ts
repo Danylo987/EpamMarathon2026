@@ -35,13 +35,14 @@ function buttonByText(root: ParentNode, text: string): HTMLButtonElement | undef
 
 describe('Рівень 2 · сторінка Owner Review', () => {
   let service: jasmine.SpyObj<GroupOrdersService>;
+  let toast: jasmine.SpyObj<ToastService>;
 
   function create() {
     TestBed.configureTestingModule({
       imports: [GroupOrderPageComponent],
       providers: [
         { provide: GroupOrdersService, useValue: service },
-        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info']) },
+        { provide: ToastService, useValue: toast },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ reservationId: 'res-1' }) } } },
       ],
     });
@@ -51,6 +52,7 @@ describe('Рівень 2 · сторінка Owner Review', () => {
   }
 
   beforeEach(() => {
+    toast = jasmine.createSpyObj<ToastService>('ToastService', ['success', 'error', 'info']);
     service = jasmine.createSpyObj<GroupOrdersService>('GroupOrdersService', [
       'getGroupInvite$', 'getSessions$', 'getOwnerSessionId$', 'getStatus$', 'submit$',
     ]);
@@ -162,14 +164,22 @@ describe('Рівень 2 · сторінка Owner Review', () => {
     });
 
     it('помилка submit: екран не ламається, кнопку можна натиснути знову', () => {
-      service.submit$.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
+      service.submit$.and.returnValue(
+        throwError(() => new HttpErrorResponse({
+          status: 400,
+          error: { message: 'No confirmed carts available.' },
+        })),
+      );
       const { fixture, element } = create();
       buttonByText(element, 'Submit Pre-Order')?.click();
       fixture.detectChanges();
       buttonByText(element.querySelector('[role="dialog"]')!, 'Submit')?.click();
       fixture.detectChanges();
 
+      expect(element.querySelector('[role="alert"]')?.textContent).toContain('No confirmed carts available.');
+      expect(element.querySelector('[role="dialog"]')).not.toBeNull();
       expect(buttonByText(element, 'Submit Pre-Order')?.disabled).toBeFalse();
+      expect(toast.error).toHaveBeenCalledWith('No confirmed carts available.', 'Submit Pre-Order');
     });
   });
 });

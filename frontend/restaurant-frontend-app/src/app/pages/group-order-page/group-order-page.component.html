@@ -22,7 +22,12 @@
               }
             </span>
           </div>
-          <button class="close-btn" type="button" aria-label="Close">
+          <button
+            class="close-btn"
+            type="button"
+            aria-label="Close"
+            (click)="closeRequested.emit()"
+          >
             <svg viewBox="0 0 28 28" aria-hidden="true" focusable="false">
               <path d="M4 4 24 24M24 4 4 24" />
             </svg>
@@ -57,7 +62,7 @@
               <circle cx="9" cy="8" r="3" />
               <path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.6v1" />
             </svg>
-            {{ participants().length }} of {{ invite()?.MaxGuestCount }} guests
+            {{ participants().length }} guests
           </span>
         </div>
       </header>
@@ -146,6 +151,9 @@
   @if (showSubmitDialog()) {
     <app-modal title="Submit Pre-Order?" (closed)="closeSubmitDialog()">
       <p>Submit the consolidated pre-order to the restaurant?</p>
+      @if (submitError()) {
+        <p class="state-message" role="alert">{{ submitError() }}</p>
+      }
       <div modal-actions class="dialog-actions">
         <button
           class="cancel-btn"
@@ -181,10 +189,20 @@
         <p class="state-message" role="alert">Unable to remove guest. Please try again.</p>
       }
       <div modal-actions class="dialog-actions">
-        <button class="cancel-btn" type="button" [disabled]="removingGuest()" (click)="closeRemoveDialog()">
+        <button
+          class="cancel-btn remove-dialog-cancel-btn"
+          type="button"
+          [disabled]="removingGuest()"
+          (click)="closeRemoveDialog()"
+        >
           Cancel
         </button>
-        <button class="confirm-btn" type="button" [disabled]="removingGuest()" (click)="removeGuest()">
+        <button
+          class="confirm-btn remove-confirm-btn"
+          type="button"
+          [disabled]="removingGuest()"
+          (click)="removeGuest()"
+        >
           {{ removingGuest() ? 'Removing…' : 'Remove Guest' }}
         </button>
       </div>

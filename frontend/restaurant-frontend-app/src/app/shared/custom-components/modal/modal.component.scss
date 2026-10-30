@@ -26,6 +26,20 @@
   box-shadow: 0 0 5px rgba(218, 218, 218, 0.7);
 }
 
+.modal-card--transparent {
+  gap: 0;
+  padding: 0;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+
+  .modal-close {
+    display: none;
+  }
+}
+
 .modal-close {
   position: absolute;
   top: 16px;

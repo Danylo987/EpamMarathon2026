@@ -7,7 +7,7 @@
         <button class="link-btn" type="button">Edit my Pre-Order</button>
       } @else if (participant().type === 'Guest' && canRemove()) {
         <button
-          class="link-btn"
+          class="link-btn remove-guest-btn"
           type="button"
           aria-label="Remove {{ participant().name }}"
           (click)="removeGuest()"
@@ -56,9 +56,6 @@
 
           <div class="item-copy">
             <p class="name">{{ item.dish.name }}</p>
-            @if (item.dish.weight) {
-              <p class="meta">{{ item.dish.weight }}</p>
-            }
           </div>
 
           <div class="quantity-stepper" aria-label="Quantity for {{ item.dish.name }}">
@@ -69,7 +66,9 @@
               aria-label="Decrease quantity for {{ item.dish.name }}"
               [disabled]="readOnly()"
             >
-              <span class="stepper-symbol minus-symbol" aria-hidden="true">−</span>
+              <svg class="stepper-icon minus-icon" viewBox="0 0 12 2" aria-hidden="true" focusable="false">
+                <path d="M1 1h10" />
+              </svg>
             </button>
             <span class="stepper-value">{{ item.quantity }}</span>
             <button
@@ -78,7 +77,9 @@
               aria-label="Increase quantity for {{ item.dish.name }}"
               [disabled]="readOnly()"
             >
-              <span class="stepper-symbol plus-symbol" aria-hidden="true">+</span>
+              <svg class="stepper-icon plus-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                <path d="M6 1v10M1 6h10" />
+              </svg>
             </button>
           </div>
 

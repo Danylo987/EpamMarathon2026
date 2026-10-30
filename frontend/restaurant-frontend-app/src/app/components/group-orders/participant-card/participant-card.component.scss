@@ -72,6 +72,16 @@
   cursor: pointer;
 }
 
+.remove-guest-btn {
+  border-bottom-color: color.$neutral-900;
+  color: color.$neutral-900;
+}
+
+.remove-guest-btn:hover {
+  color: color.$neutral-900;
+  background: color.$neutral-100;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -199,36 +209,28 @@
   color: color.$neutral-400;
 }
 
-.stepper-btn.minus.active {
-  border-color: color.$green-600;
-  color: color.$green-600;
-}
-
 .stepper-btn.plus {
   border: 1.4px solid color.$green-600;
   background: color.$neutral-0;
   color: color.$green-600;
 }
 
-.stepper-symbol {
+.stepper-icon {
   display: block;
-  height: 24px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 24px;
-  text-align: center;
-  vertical-align: middle;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
 }
 
-.minus-symbol {
-  width: 9px;
-  color: color.$neutral-400;
+.minus-icon {
+  width: 12px;
+  height: 2px;
 }
 
-.plus-symbol {
-  width: 10px;
-  color: color.$green-600;
+.plus-icon {
+  width: 12px;
+  height: 12px;
 }
 
 .stepper-value {

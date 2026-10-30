@@ -3,6 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { SKIP_ERROR_TOAST } from '@app/auth/skip-error-toast.context';
 import { API_BASE_URL } from '@app/shared/config/api-base-url.token';
 import { GroupOrdersService } from './group-orders.service';
 
@@ -60,6 +61,7 @@ describe('Рівень 2 · GroupOrdersService', () => {
     const req = http.expectOne(`${BASE_URL}/group-reservations/grp-1/submit`);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ reservationId: 'res-1' });
+    expect(req.request.context.get(SKIP_ERROR_TOAST)).toBeTrue();
     req.flush([]);
   });
 });

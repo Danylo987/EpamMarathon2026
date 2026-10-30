@@ -8,6 +8,7 @@ import {
   computed,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -38,6 +39,7 @@ import { GroupOrdersService } from '@app/services/group-orders/group-orders.serv
 import { ToastService } from '@app/services/toast/toast.service';
 import { ModalComponent } from '@app/shared/custom-components/modal/modal.component';
 import { consolidatePreOrder } from '@app/shared/helpers/consolidate-pre-order';
+import { getServerErrorMessage } from '@app/shared/helpers/http-error-helpers';
 
 interface GroupOrderHeader {
   GroupReservationId: string;
@@ -70,6 +72,7 @@ export class GroupOrderPageComponent implements OnInit {
     'locationAddress' | 'guestCount' | 'startTime' | 'endTime'
   > | null>(null);
   readonly modalMode = input(false);
+  readonly closeRequested = output<void>();
   private readonly routeReservationId = this.route.snapshot.paramMap.get('reservationId') ?? '';
   private readonly activeReservationId = computed(
     () => this.reservationIdInput() || this.routeReservationId,
@@ -83,6 +86,7 @@ export class GroupOrderPageComponent implements OnInit {
   readonly loadError = signal('');
   readonly showSubmitDialog = signal(false);
   readonly submitting = signal(false);
+  readonly submitError = signal('');
   readonly updatedAt = signal<Date | null>(null);
   readonly refreshError = signal(false);
   readonly refreshing = signal(false);
@@ -119,6 +123,7 @@ export class GroupOrderPageComponent implements OnInit {
 
   openSubmitDialog(): void {
     if (this.canSubmit()) {
+      this.submitError.set('');
       this.showSubmitDialog.set(true);
     }
   }
@@ -126,6 +131,7 @@ export class GroupOrderPageComponent implements OnInit {
   closeSubmitDialog(): void {
     if (!this.submitting()) {
       this.showSubmitDialog.set(false);
+      this.submitError.set('');
     }
   }
 
@@ -180,6 +186,7 @@ export class GroupOrderPageComponent implements OnInit {
     }
 
     this.submitting.set(true);
+    this.submitError.set('');
     this.groupOrdersService
       .submit$(groupReservationId, this.activeReservationId())
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -191,9 +198,12 @@ export class GroupOrderPageComponent implements OnInit {
           this.showSubmitDialog.set(false);
           this.toast.success('Pre-order sent to the restaurant');
         },
-        error: () => {
+        error: (error: HttpErrorResponse) => {
           this.submitting.set(false);
-          this.showSubmitDialog.set(false);
+          const message =
+            getServerErrorMessage(error) || 'The pre-order could not be submitted. Please try again.';
+          this.submitError.set(message);
+          this.toast.error(message, 'Submit Pre-Order');
         },
       });
   }

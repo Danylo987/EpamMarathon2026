@@ -1,4 +1,4 @@
-// Бонус · Remove Guest — сторінка. Запуск: npm run test:hw
+// Remove Guest page tests. Run with: npm run test:hw
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
@@ -25,7 +25,7 @@ function buttonByText(root: ParentNode, text: string): HTMLButtonElement | undef
   return [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === text) as HTMLButtonElement | undefined;
 }
 
-describe('Бонус · Remove Guest', () => {
+describe('Remove Guest', () => {
   let service: jasmine.SpyObj<GroupOrdersService>;
 
   function create() {
@@ -56,15 +56,19 @@ describe('Бонус · Remove Guest', () => {
     service.getStatus$.and.returnValue(of({ currentParticipants: 3, maxCapacity: 5, status: 'Open' as const }));
   });
 
-  it('«Remove Guest» є біля кожного гостя і немає біля Owner', () => {
+  it('shows Remove Guest for each guest but not for the owner', () => {
     expect(removeButtons(create().element).length).toBe(2);
   });
 
-  it('кнопка має aria-label з ім\'ям: «Remove Andrii»', () => {
+  it('sets the guest name in the Remove button aria-label', () => {
     expect(removeButtons(create().element)[0].getAttribute('aria-label')).toBe('Remove Andrii');
   });
 
-  it('клік → діалог з ім\'ям гостя → підтвердження видаляє і оновлює список з відповіді', () => {
+  it('applies destructive styling to the Remove Guest button', () => {
+    expect(removeButtons(create().element)[0].classList).toContain('remove-guest-btn');
+  });
+
+  it('opens a named confirmation dialog and updates the list after removal', () => {
     service.removeSession$.and.returnValue(of({ participants: SESSIONS.participants.slice(0, 2), total: 540 }));
     const { fixture, element } = create();
 
@@ -81,7 +85,20 @@ describe('Бонус · Remove Guest', () => {
     expect(element.querySelectorAll('app-participant-card').length).toBe(2);
   });
 
-  it('помилка DELETE: список лишається без змін', () => {
+  it('places Cancel to the left of Remove Guest in the dialog', () => {
+    const { fixture, element } = create();
+    removeButtons(element)[0].click();
+    fixture.detectChanges();
+
+    const dialog = element.querySelector('[role="dialog"]')!;
+    const actionButtons = [...dialog.querySelectorAll('.dialog-actions button')];
+    expect(actionButtons[0].textContent?.trim()).toBe('Cancel');
+    expect(actionButtons[1].textContent?.trim()).toBe('Remove Guest');
+    expect(actionButtons[0].classList).toContain('remove-dialog-cancel-btn');
+    expect(actionButtons[1].classList).toContain('remove-confirm-btn');
+  });
+
+  it('keeps the list unchanged when the DELETE request fails', () => {
     service.removeSession$.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
     const { fixture, element } = create();
     removeButtons(element)[1].click();
@@ -91,7 +108,7 @@ describe('Бонус · Remove Guest', () => {
     expect(element.querySelectorAll('app-participant-card').length).toBe(3);
   });
 
-  it('після Submit кнопок «Remove Guest» немає', () => {
+  it('hides Remove Guest buttons after the group is submitted', () => {
     service.getStatus$.and.returnValue(of({ currentParticipants: 3, maxCapacity: 5, status: 'Submitted' as const }));
     expect(removeButtons(create().element).length).toBe(0);
   });
