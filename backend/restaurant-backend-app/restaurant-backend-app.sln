@@ -14,6 +14,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportSender", "dnapp\lambd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportsHandler", "dnapp\lambdas\reports-handler\ReportsHandler.csproj", "{88BB83FD-02D7-4B91-9D4F-1B7A6424736D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalApi", "LocalApi\LocalApi.csproj", "{DDC6451F-A4CC-41E5-AB2B-6B71E3A337CE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{88BB83FD-02D7-4B91-9D4F-1B7A6424736D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88BB83FD-02D7-4B91-9D4F-1B7A6424736D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88BB83FD-02D7-4B91-9D4F-1B7A6424736D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDC6451F-A4CC-41E5-AB2B-6B71E3A337CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDC6451F-A4CC-41E5-AB2B-6B71E3A337CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDC6451F-A4CC-41E5-AB2B-6B71E3A337CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDC6451F-A4CC-41E5-AB2B-6B71E3A337CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
