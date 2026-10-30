@@ -1,0 +1,377 @@
+@use 'app/shared/styles/abstracts/colors' as color;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: color.$neutral-0;
+  padding: 28px 12px;
+}
+
+:host(.modal-mode) {
+  min-height: 0;
+  padding: 0;
+}
+
+.page {
+  width: 835px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.panel {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  background: color.$neutral-100;
+  border-radius: 24px;
+  padding: 40px;
+}
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 755px;
+  max-width: 100%;
+  min-height: 85px;
+  margin-bottom: 18px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+h1 {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 40px;
+  letter-spacing: 0;
+  color: color.$neutral-900;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 4px 12px;
+  background: #dadada;
+  border-radius: 8px;
+  color: color.$neutral-900;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.close-btn svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+  fill: none;
+  stroke: color.$neutral-700;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  padding: 7px 0;
+  color: color.$neutral-600;
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-item svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  fill: none;
+  stroke: color.$green-600;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.content-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 755px;
+  max-width: 100%;
+  height: auto;
+  max-height: 1392px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 16px;
+  background: #fffdec;
+  border: 1px solid #dfe0b8;
+  border-radius: 10px;
+  color: color.$neutral-900;
+  font-size: 0.95rem;
+}
+
+.sync-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  color: color.$neutral-600;
+  font-size: 0.875rem;
+}
+
+.refresh-btn {
+  padding: 6px 12px;
+  border: 1px solid color.$green-600;
+  border-radius: 8px;
+  background: color.$neutral-0;
+  color: color.$green-800;
+  font: inherit;
+  cursor: pointer;
+}
+
+.refresh-btn:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.refresh-warning {
+  margin: 0;
+  color: color.$neutral-700;
+  font-size: 0.875rem;
+}
+
+.notice-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  fill: none;
+  stroke: color.$neutral-600;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.notice-name {
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.state-message,
+.empty-message {
+  margin: 0;
+  padding: 20px 0;
+  color: color.$neutral-700;
+}
+
+.error-state p {
+  margin: 0 0 12px;
+}
+
+.retry-btn,
+.cancel-btn,
+.confirm-btn {
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.retry-btn,
+.cancel-btn {
+  background: color.$neutral-100;
+  color: color.$neutral-900;
+}
+
+.confirm-btn {
+  background: color.$green-600;
+  color: color.$neutral-0;
+}
+
+.retry-btn:disabled,
+.cancel-btn:disabled,
+.confirm-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.consolidated-order {
+  margin-top: 20px;
+  padding: 16px;
+  background: color.$neutral-0;
+  border: 1px solid #dfe7df;
+  border-radius: 12px;
+}
+
+.consolidated-order h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.consolidated-order ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.consolidated-order li,
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.participants {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.participants li {
+  display: block;
+}
+
+.grand-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 755px;
+  max-width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  margin-top: 20px;
+  padding-top: 0;
+  border-top: 1px solid #dfe6df;
+  font-family: 'Poppins', sans-serif;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 40px;
+  color: color.$neutral-900;
+}
+
+.grand-total strong {
+  width: 60px;
+  height: 40px;
+  flex: 0 0 60px;
+  margin-right: 24px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 26px;
+  font-weight: 500;
+  line-height: 40px;
+  color: color.$green-800;
+}
+
+.submit-btn {
+  width: 100%;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #0b5b29, #0f7a37 80%);
+  color: color.$neutral-0;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: center;
+  padding: 16px 20px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  background: #d3d3d3;
+  color: color.$neutral-600;
+  cursor: not-allowed;
+}
+
+@media (max-width: 460px) {
+  :host {
+    padding-inline: 8px;
+  }
+
+  .panel {
+    min-height: 0;
+    padding: 16px 12px 12px;
+  }
+
+  .content-body {
+    max-height: min(1392px, calc(100dvh - 280px));
+  }
+
+  .meta-row {
+    gap: 8px 10px;
+    font-size: 0.8rem;
+  }
+
+  .title-group {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .grand-total {
+    font-size: 21px;
+  }
+
+  .grand-total strong {
+    margin-right: 0;
+    font-size: 21px;
+  }
+}

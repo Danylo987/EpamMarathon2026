@@ -41,4 +41,7 @@ public class ReservationResponse
 
     [JsonPropertyName("guestInviteLinkAvailable")]
     public bool GuestInviteLinkAvailable { get; set; }
+
+    [JsonPropertyName("groupReservationId")]
+    public string? GroupReservationId { get; set; }
 }

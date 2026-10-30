@@ -204,6 +204,24 @@ public class GroupReservationServiceTests
 
     [Theory]
     [AutoData]
+    public async Task GetGroupReservationInviteTokenAsync_GroupReservationMissing_ThrowsNotFound(Reservation reservation)
+    {
+        reservation.Status = ReservationStatus.Reserved;
+        reservation.GuestCount = 3;
+
+        _reservationRepositoryMock
+            .Setup(r => r.GetReservationByIdAsync(reservation.Id))
+            .ReturnsAsync(reservation);
+        _groupReservationRepositoryMock
+            .Setup(r => r.GetByReservationIdAsync(reservation.Id))
+            .ReturnsAsync((GroupReservation?)null);
+
+        await Assert.ThrowsAsync<GroupReservationNotFoundException>(
+            () => _service.GetGroupReservationInviteTokenAsync(reservation.Id));
+    }
+
+    [Theory]
+    [AutoData]
     public async Task GetGroupReservationInviteTokenAsync_OneGuest_ThrowsValidationException(Reservation reservation)
     {
         reservation.Status = ReservationStatus.Reserved;
@@ -281,6 +299,16 @@ public class GroupReservationServiceTests
         {
             new()
             {
+                Id = "owner-session",
+                GroupReservationId = groupReservationId,
+                GuestName = "Owner",
+                IsOwnerSession = true,
+                OwnerUserId = userId,
+                Dishes = [],
+                IsSubmitted = false
+            },
+            new()
+            {
                 Id = "submitted-1",
                 GroupReservationId = groupReservationId,
                 GuestName = "Guest 1",
@@ -315,7 +343,7 @@ public class GroupReservationServiceTests
             ReservationId = reservationId,
             ReservationAddress = "Address",
             ReservationTime = "Time",
-            Dishes = []
+            Dishes = [new OrderItem { DishId = "owner-dish", Quantity = 1 }]
         };
         Order? savedOrder = null;
         GroupReservation? savedGroup = null;
@@ -352,11 +380,16 @@ public class GroupReservationServiceTests
             {
                 Assert.Equal("dish-2", second.DishId);
                 Assert.Equal(2, second.Quantity);
+            },
+            third =>
+            {
+                Assert.Equal("owner-dish", third.DishId);
+                Assert.Equal(1, third.Quantity);
             });
         Assert.NotNull(savedOrder);
         Assert.Equal(OrderStatus.SubmittedByCustomer, savedOrder.Status);
         Assert.Equal(
-            new[] { ("dish-1", 3), ("dish-2", 2) },
+            new[] { ("dish-1", 3), ("dish-2", 2), ("owner-dish", 1) },
             savedOrder.Dishes.Select(dish => (dish.DishId, dish.Quantity)));
         Assert.All(savedOrder.Dishes, dish => Assert.Equal(APIHandler.Constants.Orders.OrderItemState.Pending, dish.State));
         Assert.NotNull(savedGroup);

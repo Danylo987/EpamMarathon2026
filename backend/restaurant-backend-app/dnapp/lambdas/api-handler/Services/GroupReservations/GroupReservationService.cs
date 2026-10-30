@@ -154,7 +154,8 @@ public class GroupReservationService(
         if (reservation.Status != ReservationStatus.Reserved)
             throw new GroupReservationExpiredException("The group reservation is expired.");
 
-        GroupReservation groupReservation = (await groupReservationRepository.GetByReservationIdAsync(reservationId))!;
+        GroupReservation groupReservation = await groupReservationRepository.GetByReservationIdAsync(reservationId)
+            ?? throw new GroupReservationNotFoundException();
 
         if (groupReservation.Status == GroupReservationStatus.Submitted)
             throw new GroupReservationSubmittedException();
@@ -182,14 +183,35 @@ public class GroupReservationService(
         if (!string.Equals(reservation.CustomerId, userId, StringComparison.OrdinalIgnoreCase))
             throw new ActionForbiddenException("Only the reservation owner can perform this action.");
 
-        List<GuestSession> submittedSessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
-        submittedSessions = submittedSessions.Where(session => session.IsSubmitted).ToList();
+        List<GuestSession> sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
+        List<GuestSession> submittedGuestSessions = sessions
+            .Where(session => !session.IsOwnerSession && session.IsSubmitted)
+            .ToList();
+        GuestSession? ownerSession = sessions.FirstOrDefault(session => session.IsOwnerSession);
+        IEnumerable<OrderItem> submittedGuestDishes = submittedGuestSessions.SelectMany(session => session.Dishes);
 
-        if (submittedSessions.Count == 0)
+        if (submittedGuestSessions.Count == 0 && ownerSession is null)
             throw new ValidationException("There are no submitted guest sessions.");
 
-        List<GroupPreOrderItemResponse> consolidatedDishes = submittedSessions
-            .SelectMany(session => session.Dishes)
+        Order? order = ownerSession is null
+            ? null
+            : await orderRepository.GetOrderByReservationIdAsync(reservationId);
+
+        IEnumerable<OrderItem> ownerDishes = order is { Dishes.Count: > 0 }
+            ? order.Dishes
+            : ownerSession?.IsSubmitted == true
+                ? ownerSession.Dishes
+                : [];
+        if (!submittedGuestDishes.Any() && !ownerDishes.Any())
+        {
+            if (submittedGuestSessions.Count == 0)
+                throw new ValidationException("There are no submitted guest sessions.");
+
+            throw new ValidationException("Submitted guest sessions do not contain any dishes.");
+        }
+
+        List<GroupPreOrderItemResponse> consolidatedDishes = submittedGuestDishes
+            .Concat(ownerDishes)
             .GroupBy(dish => dish.DishId)
             .Select(group => new GroupPreOrderItemResponse(group.Key, group.Sum(dish => dish.Quantity)))
             .ToList();
@@ -197,7 +219,7 @@ public class GroupReservationService(
         if (consolidatedDishes.Count == 0)
             throw new ValidationException("Submitted guest sessions do not contain any dishes.");
 
-        Order order = await orderRepository.GetOrderByReservationIdAsync(reservationId)
+        order ??= await orderRepository.GetOrderByReservationIdAsync(reservationId)
             ?? throw new ValidationException("Order for the reservation was not found.");
 
         order.Dishes = consolidatedDishes

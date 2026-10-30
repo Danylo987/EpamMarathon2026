@@ -11,6 +11,7 @@ using APIHandler.Repositories.Auth;
 using APIHandler.Repositories.Dishes;
 using APIHandler.Repositories.GroupReservations;
 using APIHandler.Repositories.GuestSessions;
+using APIHandler.Repositories.Orders;
 using APIHandler.Repositories.Reservations;
 using APIHandler.Repositories.Tables;
 using System;
@@ -28,6 +29,7 @@ public class GuestSessionService(
     IGuestSessionRepository guestSessionRepository,
     IDishRepository dishRepository,
     IReservationRepository reservationRepository,
+    IOrderRepository orderRepository,
     IUserRepository userRepository,
     ITableRepository tableRepository) : IGuestSessionService
 {
@@ -201,11 +203,18 @@ public class GuestSessionService(
 
     private async Task<GetAllSessionsResponse> GetGroupReservationSessionsResponseAsync(string groupReservationId)
     {
+        GroupReservation groupReservation = await groupReservationRepository.GetGroupReservationByIdAsync(groupReservationId)
+            ?? throw new GroupReservationNotFoundException();
+        Reservation reservation = await reservationRepository.GetReservationByIdAsync(groupReservation.ReservationId)
+            ?? throw new ReservationNotFoundException("Parent reservation not found.");
+        Order? reservationOrder = await orderRepository.GetOrderByReservationIdAsync(reservation.Id);
         var sessions = await guestSessionRepository.GetAllByGroupReservationIdAsync(groupReservationId);
 
+        var ownerOrderDishes = reservationOrder?.Dishes ?? [];
         var dishIds = sessions
             .SelectMany(s => s.Dishes)
             .Select(s => s.DishId)
+            .Concat(ownerOrderDishes.Select(dish => dish.DishId))
             .Distinct()
             .ToArray();
 
@@ -216,7 +225,11 @@ public class GuestSessionService(
 
         foreach (var guestSession in sessions)
         {
-            var items = guestSession.Dishes.Select(d => new OrderItemResponse
+            IEnumerable<OrderItem> participantDishes =
+                guestSession.IsOwnerSession && reservationOrder is not null
+                    ? ownerOrderDishes
+                    : guestSession.Dishes;
+            var items = participantDishes.Select(d => new OrderItemResponse
             {
                 Dish = DishMapper.ToDishResponse(dishesById[d.DishId]),
                 Quantity = d.Quantity
@@ -231,7 +244,9 @@ public class GuestSessionService(
             }
 
             var type = guestSession.IsOwnerSession ? ParticipantType.Owner : ParticipantType.Guest;
-            var participant = new Participant(guestSession.Id, type, name, items, total, guestSession.IsSubmitted);
+            bool isSubmitted = guestSession.IsSubmitted ||
+                (guestSession.IsOwnerSession && ownerOrderDishes.Count > 0);
+            var participant = new Participant(guestSession.Id, type, name, items, total, isSubmitted);
             participants.Add(participant);
         }
 
@@ -399,4 +414,3 @@ public class GuestSessionService(
     }
 
 }
-

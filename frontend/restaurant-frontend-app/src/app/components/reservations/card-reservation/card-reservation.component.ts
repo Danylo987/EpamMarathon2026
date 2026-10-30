@@ -18,6 +18,8 @@ import {
 import { PlaceOrderWaiterComponent } from '@app/components/place-order-waiter/place-order-waiter.component';
 import { Roles } from '@app/shared/constants/roles';
 import { CustomSelectComponent } from '@app/shared/custom-components/custom-select/custom-select.component';
+import { ModalComponent } from '@app/shared/custom-components/modal/modal.component';
+import { GroupOrderPageComponent } from '@app/pages/group-order-page/group-order-page.component';
 
 interface ReservationStatusView {
   class: string;
@@ -38,6 +40,8 @@ interface WaiterPreOrderNavigationData {
     DatePipe,
     CustomSelectComponent,
     PlaceOrderWaiterComponent,
+    ModalComponent,
+    GroupOrderPageComponent,
   ],
   templateUrl: './card-reservation.component.html',
   styleUrl: './card-reservation.component.scss',
@@ -93,6 +97,7 @@ export class CardReservationComponent {
 
   readonly preOrder = output<CreateOrderRequest>();
   readonly showWaiterOrderModal = signal(false);
+  readonly showGroupOrderModal = signal(false);
 
   readonly statusView = computed<ReservationStatusView>(() => {
     const reservation = this.r();
@@ -186,6 +191,14 @@ export class CardReservationComponent {
 
   closeWaiterOrderModal(): void {
     this.showWaiterOrderModal.set(false);
+  }
+
+  openGroupOrderModal(): void {
+    this.showGroupOrderModal.set(true);
+  }
+
+  closeGroupOrderModal(): void {
+    this.showGroupOrderModal.set(false);
   }
 
   onWaiterOrderCreated(order: CreateOrderRequest): void {

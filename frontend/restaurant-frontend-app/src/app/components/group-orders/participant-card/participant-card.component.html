@@ -1,0 +1,97 @@
+﻿<article class="card">
+  <header class="header">
+    <h2 class="title">{{ title() }}</h2>
+
+    @if (!readOnly()) {
+      @if (participant().id === ownerSessionId()) {
+        <button class="link-btn" type="button">Edit my Pre-Order</button>
+      } @else if (participant().type === 'Guest' && canRemove()) {
+        <button
+          class="link-btn"
+          type="button"
+          aria-label="Remove {{ participant().name }}"
+          (click)="removeGuest()"
+        >
+          Remove Guest
+        </button>
+      }
+    }
+  </header>
+
+  <p class="submission-status">
+    {{ participant().isSubmitted ? 'Submitted' : 'Still choosing' }}
+  </p>
+
+  @if (participant().items.length) {
+    <ul class="items">
+      @for (item of participant().items; track item.dish.id) {
+        <li class="item">
+          <button
+            class="delete-btn"
+            type="button"
+            aria-label="Remove {{ item.dish.name }}"
+            [disabled]="readOnly()"
+          >
+            <img
+              class="trash-icon"
+              src="assets/img/group-preorder/trash.png"
+              alt=""
+              width="24"
+              height="24"
+            />
+          </button>
+
+          @if (item.dish.imageUrl) {
+            <img
+              class="avatar"
+              [src]="item.dish.imageUrl"
+              alt=""
+              width="48"
+              height="48"
+              loading="lazy"
+            />
+          } @else {
+            <span class="avatar initial" aria-hidden="true">{{ item.dish.name.charAt(0) }}</span>
+          }
+
+          <div class="item-copy">
+            <p class="name">{{ item.dish.name }}</p>
+            @if (item.dish.weight) {
+              <p class="meta">{{ item.dish.weight }}</p>
+            }
+          </div>
+
+          <div class="quantity-stepper" aria-label="Quantity for {{ item.dish.name }}">
+            <button
+              class="stepper-btn minus"
+              [class.active]="item.quantity > 1"
+              type="button"
+              aria-label="Decrease quantity for {{ item.dish.name }}"
+              [disabled]="readOnly()"
+            >
+              <span class="stepper-symbol minus-symbol" aria-hidden="true">−</span>
+            </button>
+            <span class="stepper-value">{{ item.quantity }}</span>
+            <button
+              class="stepper-btn plus"
+              type="button"
+              aria-label="Increase quantity for {{ item.dish.name }}"
+              [disabled]="readOnly()"
+            >
+              <span class="stepper-symbol plus-symbol" aria-hidden="true">+</span>
+            </button>
+          </div>
+
+          <p class="price">{{ item.dish.price * item.quantity | currency }}</p>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="empty">No dishes yet</p>
+  }
+
+  <p class="subtotal">
+    <span>Subtotal</span>
+    <span>{{ participant().total | currency }}</span>
+  </p>
+</article>

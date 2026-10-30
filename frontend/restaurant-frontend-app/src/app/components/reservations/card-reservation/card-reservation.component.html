@@ -197,6 +197,16 @@
     }
 
     @if (role() === Roles.CUSTOMER) {
+      @if (r().groupReservationId && r().status !== ReservationStatusCustomer.Cancelled) {
+        <button
+          type="button"
+          class="button button--secondary button--large"
+          (click)="openGroupOrderModal()"
+        >
+          Group pre-order
+        </button>
+      }
+
       @if (
         r().status !==
         ReservationStatusCustomer.Reserved &&
@@ -292,4 +302,24 @@
     (closeModal)="closeWaiterOrderModal()"
     (placeOrder)="onWaiterOrderCreated($event)"
   />
+}
+
+@if (showGroupOrderModal()) {
+  <app-modal
+    title=""
+    [width]="'1000px'"
+    (closed)="closeGroupOrderModal()"
+  >
+    <app-group-order-page
+      [reservationIdInput]="r().id"
+      [groupReservationIdInput]="r().groupReservationId ?? null"
+      [reservationContext]="{
+        locationAddress: r().locationAddress,
+        guestCount: r().guestCount,
+        startTime: r().startTime,
+        endTime: r().endTime
+      }"
+      [modalMode]="true"
+    />
+  </app-modal>
 }
