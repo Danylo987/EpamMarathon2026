@@ -12,11 +12,29 @@
   padding: 0;
 }
 
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+
+html:has(.modal-backdrop .cart),
+html:has(.backdrop .drawer),
+body:has(.modal-backdrop .cart),
+body:has(.backdrop .drawer) {
+  overflow: hidden;
+}
+
 .toast-success,
 .toast-error,
 .toast-info {
   margin-top: 87px !important;
-  margin-right:20px !important;
+  margin-right: 20px !important;
 }
 .toast-success .mat-mdc-snackbar-surface {
   background-color: color.$green-100 !important;

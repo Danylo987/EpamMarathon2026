@@ -12,17 +12,45 @@ import { GroupOrderPageComponent } from './group-order-page.component';
 const caesar = { id: 'dish1', name: 'Caesar Salad', price: 180 };
 const SESSIONS: GroupSessionsResponse = {
   participants: [
-    { id: 'owner', type: 'Owner', name: 'Yevhenii', isSubmitted: true, total: 180, items: [{ dish: caesar, quantity: 1 }] },
-    { id: 'andrii', type: 'Guest', name: 'Andrii', isSubmitted: true, total: 360, items: [{ dish: caesar, quantity: 2 }] },
-    { id: 'olena', type: 'Guest', name: 'Olena', isSubmitted: false, total: 180, items: [{ dish: caesar, quantity: 1 }] },
+    {
+      id: 'owner',
+      type: 'Owner',
+      name: 'Yevhenii',
+      isSubmitted: true,
+      total: 180,
+      items: [{ dish: caesar, quantity: 1 }],
+    },
+    {
+      id: 'andrii',
+      type: 'Guest',
+      name: 'Andrii',
+      isSubmitted: true,
+      total: 360,
+      items: [{ dish: caesar, quantity: 2 }],
+    },
+    {
+      id: 'olena',
+      type: 'Guest',
+      name: 'Olena',
+      isSubmitted: false,
+      total: 180,
+      items: [{ dish: caesar, quantity: 1 }],
+    },
   ],
   total: 720,
 };
-const INVITE = { GroupReservationId: 'grp-1', LocationAddress: 'Rustaveli Avenue 48', MaxGuestCount: 5,
-  StartTime: '2026-10-21T16:00:00Z', EndTime: '2026-10-21T17:30:00Z' } as GuestInvite;
+const INVITE = {
+  GroupReservationId: 'grp-1',
+  LocationAddress: 'Rustaveli Avenue 48',
+  MaxGuestCount: 5,
+  StartTime: '2026-10-21T16:00:00Z',
+  EndTime: '2026-10-21T17:30:00Z',
+} as GuestInvite;
 
 function buttonByText(root: ParentNode, text: string): HTMLButtonElement | undefined {
-  return [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === text) as HTMLButtonElement | undefined;
+  return [...root.querySelectorAll('button')].find((b) => b.textContent?.trim() === text) as
+    | HTMLButtonElement
+    | undefined;
 }
 
 describe('Remove Guest', () => {
@@ -35,7 +63,10 @@ describe('Remove Guest', () => {
       providers: [
         { provide: GroupOrdersService, useValue: service },
         { provide: ToastService, useValue: toast },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: convertToParamMap({ reservationId: 'res-1' }) } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: convertToParamMap({ reservationId: 'res-1' }) } },
+        },
       ],
     });
     const fixture = TestBed.createComponent(GroupOrderPageComponent);
@@ -44,18 +75,27 @@ describe('Remove Guest', () => {
   }
 
   function removeButtons(element: HTMLElement): HTMLButtonElement[] {
-    return [...element.querySelectorAll('button')].filter((b) => b.textContent?.trim() === 'Remove Guest') as HTMLButtonElement[];
+    return [...element.querySelectorAll('button')].filter(
+      (b) => b.textContent?.trim() === 'Remove Guest'
+    ) as HTMLButtonElement[];
   }
 
   beforeEach(() => {
     toast = jasmine.createSpyObj<ToastService>('ToastService', ['success', 'error', 'info']);
     service = jasmine.createSpyObj<GroupOrdersService>('GroupOrdersService', [
-      'getGroupInvite$', 'getSessions$', 'getOwnerSessionId$', 'getStatus$', 'submit$', 'removeSession$',
+      'getGroupInvite$',
+      'getSessions$',
+      'getOwnerSessionId$',
+      'getStatus$',
+      'submit$',
+      'removeSession$',
     ]);
     service.getGroupInvite$.and.returnValue(of(INVITE));
     service.getSessions$.and.returnValue(of(structuredClone(SESSIONS)));
     service.getOwnerSessionId$.and.returnValue(of('owner'));
-    service.getStatus$.and.returnValue(of({ currentParticipants: 3, maxCapacity: 5, status: 'Open' as const }));
+    service.getStatus$.and.returnValue(
+      of({ currentParticipants: 3, maxCapacity: 5, status: 'Open' as const })
+    );
   });
 
   it('shows Remove Guest for each guest but not for the owner', () => {
@@ -71,8 +111,13 @@ describe('Remove Guest', () => {
   });
 
   it('opens a named confirmation dialog and updates the list after removal', () => {
-    service.removeSession$.and.returnValue(of({ participants: SESSIONS.participants.slice(0, 2), total: 540 }));
+    service.removeSession$.and.returnValue(
+      of({ participants: SESSIONS.participants.slice(0, 2), total: 540 })
+    );
     const { fixture, element } = create();
+    const component = fixture.componentInstance;
+    const participantCountSpy = jasmine.createSpy('participantCountChanged');
+    component.participantsChanged.subscribe(participantCountSpy);
 
     removeButtons(element)[1].click(); // Olena
     fixture.detectChanges();
@@ -85,6 +130,7 @@ describe('Remove Guest', () => {
 
     expect(service.removeSession$).toHaveBeenCalledOnceWith('grp-1', 'olena');
     expect(element.querySelectorAll('app-participant-card').length).toBe(2);
+    expect(participantCountSpy).toHaveBeenCalledOnceWith(2);
     expect(toast.success).toHaveBeenCalledOnceWith('Guest Removed');
   });
 
@@ -102,7 +148,9 @@ describe('Remove Guest', () => {
   });
 
   it('keeps the list unchanged when the DELETE request fails', () => {
-    service.removeSession$.and.returnValue(throwError(() => new HttpErrorResponse({ status: 400 })));
+    service.removeSession$.and.returnValue(
+      throwError(() => new HttpErrorResponse({ status: 400 }))
+    );
     const { fixture, element } = create();
     removeButtons(element)[1].click();
     fixture.detectChanges();
@@ -112,7 +160,9 @@ describe('Remove Guest', () => {
   });
 
   it('hides Remove Guest buttons after the group is submitted', () => {
-    service.getStatus$.and.returnValue(of({ currentParticipants: 3, maxCapacity: 5, status: 'Submitted' as const }));
+    service.getStatus$.and.returnValue(
+      of({ currentParticipants: 3, maxCapacity: 5, status: 'Submitted' as const })
+    );
     expect(removeButtons(create().element).length).toBe(0);
   });
 });

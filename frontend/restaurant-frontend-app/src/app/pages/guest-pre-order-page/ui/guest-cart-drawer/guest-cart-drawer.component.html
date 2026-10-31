@@ -20,7 +20,13 @@
                 <div class="list">
                     @for (it of items(); track it.dishId) {
                         <div class="item">
-                            <img class="img" [src]="it.imageUrl" alt="" />
+                            @if (it.imageUrl) {
+                                <img class="img" [src]="it.imageUrl" [alt]="it.title" />
+                            } @else {
+                                <span class="img placeholder" aria-hidden="true">
+                                    {{ getInitialLetter(it.title) }}
+                                </span>
+                            }
 
                             <div class="info">
                                 <div class="name">{{ it.title }}</div>
@@ -28,11 +34,15 @@
 
                                 <div class="qty">
                                     <button type="button" class="qty-btn" [disabled]="busy()" (click)="dec.emit(it.dishId)" aria-label="Decrease quantity">
-                                        -
+                                        <svg class="qty-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                                            <path d="M1 6h10" />
+                                        </svg>
                                     </button>
                                     <span class="qty-value">{{ it.qty }}</span>
                                     <button type="button" class="qty-btn" [disabled]="busy()" (click)="inc.emit(it.dishId)" aria-label="Increase quantity">
-                                        +
+                                        <svg class="qty-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                                            <path d="M1 6h10M6 1v10" />
+                                        </svg>
                                     </button>
                                 </div>
                             </div>

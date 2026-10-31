@@ -1,4 +1,13 @@
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, signal, computed, effect, inject } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  ChangeDetectionStrategy,
+  signal,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import { Roles } from '@app/shared/constants/roles';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UserModel } from '@app/auth/models/user.model';
@@ -142,7 +151,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isMobileMenuOpen.set(false);
   }
 
-
   logout(event?: Event): void {
     event?.stopPropagation();
 
@@ -168,7 +176,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.notificationsService.markAsRead(notificationId).subscribe({
       next: () => {
         this.notifications.update((list) =>
-          list.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n)),
+          list.map((n) => (n.id === notificationId ? { ...n, isRead: true } : n))
         );
         //this.unreadCount = this.notifications.filter((n) => !n.isRead).length;
       },
@@ -180,5 +188,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   toggleCart() {
     this.showCart.update((v) => !v);
+  }
+
+  openGuestCart(): void {
+    this.guestPreorderStore.cartOpen.set(true);
   }
 }

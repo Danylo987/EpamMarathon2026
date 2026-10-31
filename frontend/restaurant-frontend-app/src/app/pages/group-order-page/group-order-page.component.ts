@@ -73,9 +73,10 @@ export class GroupOrderPageComponent implements OnInit {
   > | null>(null);
   readonly modalMode = input(false);
   readonly closeRequested = output<void>();
+  readonly participantsChanged = output<number>();
   private readonly routeReservationId = this.route.snapshot.paramMap.get('reservationId') ?? '';
   private readonly activeReservationId = computed(
-    () => this.reservationIdInput() || this.routeReservationId,
+    () => this.reservationIdInput() || this.routeReservationId
   );
   readonly invite = signal<GroupOrderHeader | null>(null);
   readonly groupReservationId = signal('');
@@ -156,7 +157,13 @@ export class GroupOrderPageComponent implements OnInit {
   removeGuest(): void {
     const groupReservationId = this.groupReservationId();
     const guest = this.selectedGuest();
-    if (!groupReservationId || !guest || guest.type !== 'Guest' || this.isReadOnly() || this.removingGuest()) {
+    if (
+      !groupReservationId ||
+      !guest ||
+      guest.type !== 'Guest' ||
+      this.isReadOnly() ||
+      this.removingGuest()
+    ) {
       return;
     }
 
@@ -166,11 +173,12 @@ export class GroupOrderPageComponent implements OnInit {
       .removeSession$(groupReservationId, guest.id)
       .pipe(
         finalize(() => this.removingGuest.set(false)),
-        takeUntilDestroyed(this.destroyRef),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: (sessions) => {
           this.participants.set(sessions.participants);
+          this.participantsChanged.emit(sessions.participants.length);
           this.selectedGuest.set(null);
           this.updatedAt.set(new Date());
           this.refreshError.set(false);
@@ -202,7 +210,8 @@ export class GroupOrderPageComponent implements OnInit {
         error: (error: HttpErrorResponse) => {
           this.submitting.set(false);
           const message =
-            getServerErrorMessage(error) || 'The pre-order could not be submitted. Please try again.';
+            getServerErrorMessage(error) ||
+            'The pre-order could not be submitted. Please try again.';
           this.submitError.set(message);
           this.toast.error(message, 'Submit Pre-Order');
         },
@@ -292,7 +301,7 @@ export class GroupOrderPageComponent implements OnInit {
             },
             sessions,
             ownerSessionId,
-            status,
+            status
           );
         },
         error: (error: unknown) => this.setLoadError(error),
@@ -303,7 +312,7 @@ export class GroupOrderPageComponent implements OnInit {
     header: GroupOrderHeader | GuestInvite,
     sessions: GroupSessionsResponse,
     ownerSessionId: string,
-    status: GroupStatusResponse,
+    status: GroupStatusResponse
   ): void {
     this.invite.set(header);
     this.groupReservationId.set(header.GroupReservationId);
@@ -320,7 +329,7 @@ export class GroupOrderPageComponent implements OnInit {
     this.loadError.set(
       error instanceof HttpErrorResponse && error.status === 404
         ? 'Group reservation not found'
-        : 'Unable to load group pre-order. Please try again.',
+        : 'Unable to load group pre-order. Please try again.'
     );
   }
 
@@ -331,11 +340,11 @@ export class GroupOrderPageComponent implements OnInit {
           status === 'Open'
             ? timer(
                 GroupOrderPageComponent.SYNC_INTERVAL_MS,
-                GroupOrderPageComponent.SYNC_INTERVAL_MS,
+                GroupOrderPageComponent.SYNC_INTERVAL_MS
               ).pipe(exhaustMap(() => this.synchronize()))
-            : EMPTY,
+            : EMPTY
         ),
-        takeUntilDestroyed(this.destroyRef),
+        takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
   }
@@ -361,7 +370,7 @@ export class GroupOrderPageComponent implements OnInit {
         this.refreshError.set(true);
         return EMPTY;
       }),
-      finalize(() => this.refreshing.set(false)),
+      finalize(() => this.refreshing.set(false))
     );
   }
 }

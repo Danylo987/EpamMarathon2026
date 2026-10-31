@@ -1,11 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 
 import { Order } from '@app/models/orders/order.model';
 
@@ -21,7 +15,6 @@ export class NotSubmittedOrderComponent {
   readonly order = input.required<Order>();
 
   readonly submitted = output<string>();
-  readonly addDish = output<void>();
   readonly removeDish = output<string>();
   readonly updateQuantity = output<{
     itemId: string;
@@ -29,11 +22,12 @@ export class NotSubmittedOrderComponent {
   }>();
 
   readonly totalPrice = computed(() =>
-    this.order().orderItems.reduce(
-      (total, item) => total + item.dish.price * item.quantity,
-      0,
-    ),
+    this.order().orderItems.reduce((total, item) => total + item.dish.price * item.quantity, 0)
   );
+
+  getInitialLetter(name: string): string {
+    return (name ?? '').trim().charAt(0)?.toUpperCase() || '?';
+  }
 
   incrementItemQuantity(itemId: string): void {
     const item = this.findOrderItem(itemId);
@@ -55,18 +49,12 @@ export class NotSubmittedOrderComponent {
     this.submitted.emit(this.order().orderId);
   }
 
-  addDishToOrder(): void {
-    this.addDish.emit();
-  }
-
   removeDishFromOrder(itemId: string): void {
     this.removeDish.emit(itemId);
   }
 
   private findOrderItem(itemId: string) {
-    return this.order().orderItems.find(
-      (item) => item.dish.id === itemId,
-    );
+    return this.order().orderItems.find((item) => item.dish.id === itemId);
   }
 
   private updateItemQuantity(itemId: string, quantity: number): void {

@@ -2,7 +2,11 @@
 
 .backdrop {
   position: fixed;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  width: 100vw;
   z-index: 1000;
   display: flex;
   justify-content: flex-end;
@@ -57,7 +61,13 @@
   align-content: start;
   gap: 16px;
   overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   padding: 0 24px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .item {
@@ -74,6 +84,18 @@
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.img.placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color.$green-100;
+  color: color.$green-600;
+  border: 1px solid color.$green-150;
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-transform: uppercase;
 }
 
 .info {
@@ -98,18 +120,42 @@
   margin-top: 8px;
 }
 
+.qty-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1ch;
+  height: 28px;
+  line-height: 1;
+}
+
 .qty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 28px;
   height: 28px;
   border: 1px solid color.$neutral-200;
   border-radius: 6px;
   background: color.$neutral-0;
+  color: color.$green-600;
   cursor: pointer;
 
   &:disabled {
     cursor: wait;
     opacity: 0.55;
   }
+}
+
+.qty-icon {
+  display: block;
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
 }
 
 .actions {

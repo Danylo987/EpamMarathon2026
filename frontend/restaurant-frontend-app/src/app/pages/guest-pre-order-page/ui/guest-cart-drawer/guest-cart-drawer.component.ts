@@ -23,4 +23,8 @@ export class GuestCartDrawerComponent {
     readonly dec = output<string>();
     readonly remove = output<string>();
     readonly submitted = output<void>();
+
+    getInitialLetter(value: string | null | undefined): string {
+        return (value ?? '').trim().charAt(0)?.toUpperCase() || '?';
+    }
 }

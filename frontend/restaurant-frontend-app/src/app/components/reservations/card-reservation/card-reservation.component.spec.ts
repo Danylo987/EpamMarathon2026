@@ -1,9 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { CardReservationComponent } from './card-reservation.component';
 import { API_BASE_URL } from '@app/shared/config/api-base-url.token';
-import { ReservationCustomer, ReservationStatusCustomer } from '@app/models/reservations/reservation.model';
+import {
+  ReservationCustomer,
+  ReservationStatusCustomer,
+} from '@app/models/reservations/reservation.model';
 import { GroupOrdersService } from '@app/services/group-orders/group-orders.service';
+import { GroupOrderPageComponent } from '@app/pages/group-order-page/group-order-page.component';
 import { ToastService } from '@app/services/toast/toast.service';
 import { of } from 'rxjs';
 
@@ -27,31 +32,43 @@ describe('CardReservationComponent', () => {
 
   beforeEach(async () => {
     groupOrdersService = jasmine.createSpyObj<GroupOrdersService>('GroupOrdersService', [
-      'getGroupInvite$', 'getSessions$', 'getOwnerSessionId$', 'getStatus$', 'submit$', 'removeSession$',
+      'getGroupInvite$',
+      'getSessions$',
+      'getOwnerSessionId$',
+      'getStatus$',
+      'submit$',
+      'removeSession$',
     ]);
-    groupOrdersService.getGroupInvite$.and.returnValue(of({
-      GroupReservationId: 'group-1',
-      LocationId: 'location-1',
-      RestaurantName: 'Green & Tasty',
-      LocationAddress: 'Rustaveli Avenue 48',
-      MaxGuestCount: 5,
-      StartTime: '2026-10-21T16:00:00Z',
-      EndTime: '2026-10-21T17:30:00Z',
-      TableNumber: 1,
-      InviterName: 'Owner',
-    }));
+    groupOrdersService.getGroupInvite$.and.returnValue(
+      of({
+        GroupReservationId: 'group-1',
+        LocationId: 'location-1',
+        RestaurantName: 'Green & Tasty',
+        LocationAddress: 'Rustaveli Avenue 48',
+        MaxGuestCount: 5,
+        StartTime: '2026-10-21T16:00:00Z',
+        EndTime: '2026-10-21T17:30:00Z',
+        TableNumber: 1,
+        InviterName: 'Owner',
+      })
+    );
     groupOrdersService.getSessions$.and.returnValue(of({ participants: [], total: 0 }));
     groupOrdersService.getOwnerSessionId$.and.returnValue(of('owner-1'));
-    groupOrdersService.getStatus$.and.returnValue(of({
-      currentParticipants: 0,
-      maxCapacity: 5,
-      status: 'Open',
-    }));
+    groupOrdersService.getStatus$.and.returnValue(
+      of({
+        currentParticipants: 0,
+        maxCapacity: 5,
+        status: 'Open',
+      })
+    );
     await TestBed.configureTestingModule({
       providers: [
         { provide: API_BASE_URL, useValue: 'https://test.api' },
         { provide: GroupOrdersService, useValue: groupOrdersService },
-        { provide: ToastService, useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info']) },
+        {
+          provide: ToastService,
+          useValue: jasmine.createSpyObj('ToastService', ['success', 'error', 'info']),
+        },
         provideRouter([]),
       ],
       imports: [CardReservationComponent],
@@ -73,7 +90,7 @@ describe('CardReservationComponent', () => {
     component.cancelReservation.subscribe(cancelSpy);
 
     const button = fixture.nativeElement.querySelector(
-      'button[aria-label="Cancel reservation"]',
+      'button[aria-label="Cancel reservation"]'
     ) as HTMLButtonElement;
     expect(button).not.toBeNull();
 
@@ -82,13 +99,12 @@ describe('CardReservationComponent', () => {
 
     expect(cancelSpy).not.toHaveBeenCalled();
     expect(fixture.nativeElement.textContent).toContain(
-      'Are you sure you want to cancel this reservation?',
+      'Are you sure you want to cancel this reservation?'
     );
 
-    const keepButton = [...fixture.nativeElement.querySelectorAll('button')]
-      .find((element: HTMLButtonElement) => element.textContent?.trim() === 'Keep Reservation') as
-      | HTMLButtonElement
-      | undefined;
+    const keepButton = [...fixture.nativeElement.querySelectorAll('button')].find(
+      (element: HTMLButtonElement) => element.textContent?.trim() === 'Keep Reservation'
+    ) as HTMLButtonElement | undefined;
     expect(keepButton).toBeDefined();
     keepButton?.click();
     fixture.detectChanges();
@@ -100,15 +116,12 @@ describe('CardReservationComponent', () => {
   it('cancels the reservation only after confirmation', () => {
     const cancelSpy = jasmine.createSpy('cancel');
     component.cancelReservation.subscribe(cancelSpy);
-    fixture.nativeElement
-      .querySelector('button[aria-label="Cancel reservation"]')
-      .click();
+    fixture.nativeElement.querySelector('button[aria-label="Cancel reservation"]').click();
     fixture.detectChanges();
 
-    const confirmButton = [...fixture.nativeElement.querySelectorAll('button')]
-      .find((element: HTMLButtonElement) => element.textContent?.trim() === 'Yes, Cancel') as
-      | HTMLButtonElement
-      | undefined;
+    const confirmButton = [...fixture.nativeElement.querySelectorAll('button')].find(
+      (element: HTMLButtonElement) => element.textContent?.trim() === 'Yes, Cancel'
+    ) as HTMLButtonElement | undefined;
     expect(confirmButton).toBeDefined();
     confirmButton?.click();
 
@@ -116,13 +129,12 @@ describe('CardReservationComponent', () => {
   });
 
   it('keeps visible space between the confirmation buttons', () => {
-    fixture.nativeElement
-      .querySelector('button[aria-label="Cancel reservation"]')
-      .click();
+    fixture.nativeElement.querySelector('button[aria-label="Cancel reservation"]').click();
     fixture.detectChanges();
 
-    const buttons = [...fixture.nativeElement.querySelectorAll('.cancel-reservation-actions button')] as
-      HTMLButtonElement[];
+    const buttons = [
+      ...fixture.nativeElement.querySelectorAll('.cancel-reservation-actions button'),
+    ] as HTMLButtonElement[];
     expect(buttons.length).toBe(2);
     const gap = buttons[1].getBoundingClientRect().left - buttons[0].getBoundingClientRect().right;
     expect(gap).toBeGreaterThanOrEqual(23.9);
@@ -133,10 +145,10 @@ describe('CardReservationComponent', () => {
     component.editReservation.subscribe(editSpy);
 
     const editButton = fixture.nativeElement.querySelector(
-      'button[aria-label="Edit reservation"]',
+      'button[aria-label="Edit reservation"]'
     ) as HTMLButtonElement;
     const cancelButton = fixture.nativeElement.querySelector(
-      'button[aria-label="Cancel reservation"]',
+      'button[aria-label="Cancel reservation"]'
     ) as HTMLButtonElement;
 
     expect(editButton).not.toBeNull();
@@ -152,10 +164,10 @@ describe('CardReservationComponent', () => {
     const trash = fixture.nativeElement.querySelector('.cancel-reservation-icon') as HTMLElement;
     const pencil = fixture.nativeElement.querySelector('.edit-reservation-icon') as HTMLElement;
     const preOrder = [...fixture.nativeElement.querySelectorAll('button')].find(
-      (button: HTMLButtonElement) => button.textContent?.trim() === 'Pre-order',
+      (button: HTMLButtonElement) => button.textContent?.trim() === 'Pre-order'
     ) as HTMLElement;
     const groupPreOrder = [...fixture.nativeElement.querySelectorAll('button')].find(
-      (button: HTMLButtonElement) => button.textContent?.trim() === 'Group pre-order',
+      (button: HTMLButtonElement) => button.textContent?.trim() === 'Group pre-order'
     ) as HTMLElement;
     const centerY = (element: HTMLElement) => {
       const { top, height } = element.getBoundingClientRect();
@@ -186,6 +198,21 @@ describe('CardReservationComponent', () => {
     expect(banner.classList).toContain('completed');
   });
 
+  it('updates the displayed guest count when a group participant leaves', () => {
+    const groupOrderButton = [...fixture.nativeElement.querySelectorAll('button')].find(
+      (button: HTMLButtonElement) => button.textContent?.trim() === 'Group pre-order'
+    ) as HTMLButtonElement | undefined;
+    groupOrderButton?.click();
+    fixture.detectChanges();
+
+    const groupOrderPage = fixture.debugElement.query(By.directive(GroupOrderPageComponent))
+      .componentInstance as GroupOrderPageComponent;
+    groupOrderPage.participantsChanged.emit(1);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('1 Guest');
+  });
+
   it('shows Cancelled in a red badge at the upper-right without the trash icon', () => {
     fixture.componentRef.setInput('r', {
       ...RESERVATION,
@@ -203,10 +230,9 @@ describe('CardReservationComponent', () => {
   });
 
   it('opens the group pre-order modal for the reservation', () => {
-    const button = [...fixture.nativeElement.querySelectorAll('button')]
-      .find((element: HTMLButtonElement) => element.textContent?.trim() === 'Group pre-order') as
-      | HTMLButtonElement
-      | undefined;
+    const button = [...fixture.nativeElement.querySelectorAll('button')].find(
+      (element: HTMLButtonElement) => element.textContent?.trim() === 'Group pre-order'
+    ) as HTMLButtonElement | undefined;
 
     expect(button).toBeDefined();
     button?.click();

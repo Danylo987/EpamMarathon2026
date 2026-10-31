@@ -24,11 +24,7 @@
         aria-label="Close cart"
         (click)="closeCart()"
       >
-        <img
-          src="assets/svg/close.svg"
-          alt=""
-          aria-hidden="true"
-        />
+        <img src="assets/svg/close.svg" alt="" aria-hidden="true" />
       </button>
     </div>
 
@@ -37,29 +33,15 @@
         <div class="list-header">
           <h3>Not submitted pre-orders</h3>
 
-          <span class="body">
-            You have not submitted pre-orders
-          </span>
+          <span class="body"> You have not submitted pre-orders </span>
         </div>
 
-        @for (
-            item of unsubmittedOrders();
-          track item.orderId
-          ) {
+        @for (item of unsubmittedOrders(); track item.orderId) {
           <app-not-submitted-order
             [order]="item"
             (submitted)="submitOrder($event)"
-            (removeDish)="
-              removeDishFromOrder(item.orderId, $event)
-            "
-            (addDish)="addDishToOrder(item.orderId)"
-            (updateQuantity)="
-              updateDishQuantity(
-                item.orderId,
-                $event.itemId,
-                $event.quantity
-              )
-            "
+            (removeDish)="removeDishFromOrder(item.orderId, $event)"
+            (updateQuantity)="updateDishQuantity(item.orderId, $event.itemId, $event.quantity)"
           />
         }
       </div>
@@ -71,16 +53,13 @@
           <h3>Submitted pre-orders</h3>
 
           <span class="body">
-            You can modify or cancel your pre-orders up to
-            30 minutes before your reserved table time.
+            You can modify or cancel your pre-orders up to 30 minutes before your reserved table
+            time.
           </span>
         </div>
 
         <div>
-          @for (
-              item of submittedOrders();
-            track item.orderId
-            ) {
+          @for (item of submittedOrders(); track item.orderId) {
             <app-submitted-order
               [order]="item"
               (canceled)="openCancelModal(item.orderId)"
@@ -93,20 +72,13 @@
 
     @if (orders().length === 0) {
       <div class="empty-cart">
-        <img
-          src="assets/img/empty-cart.png"
-          alt=""
-          aria-hidden="true"
-        />
+        <img src="assets/svg/cart-empty-preorder.svg" alt="" aria-hidden="true" />
 
         <div class="empty-cart-content">
           <div class="empty-cart-info">
             <h3>Your cart is empty</h3>
 
-            <span class="body">
-              Looks like you haven’t added any dishes to
-              your cart yet.
-            </span>
+            <span class="body"> Looks like you haven’t added any dishes to your cart yet. </span>
           </div>
 
           <button

@@ -19,7 +19,13 @@
   </header>
 
   <p class="submission-status">
-    {{ participant().isSubmitted ? 'Submitted' : 'Still choosing' }}
+    @if (participant().isSubmitted) {
+      Submitted
+    } @else if (participant().type === 'Guest') {
+      In Progress
+    } @else {
+      Still choosing
+    }
   </p>
 
   @if (participant().items.length) {
@@ -66,7 +72,12 @@
               aria-label="Decrease quantity for {{ item.dish.name }}"
               [disabled]="readOnly()"
             >
-              <svg class="stepper-icon minus-icon" viewBox="0 0 12 2" aria-hidden="true" focusable="false">
+              <svg
+                class="stepper-icon minus-icon"
+                viewBox="0 0 12 2"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <path d="M1 1h10" />
               </svg>
             </button>
@@ -77,7 +88,12 @@
               aria-label="Increase quantity for {{ item.dish.name }}"
               [disabled]="readOnly()"
             >
-              <svg class="stepper-icon plus-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+              <svg
+                class="stepper-icon plus-icon"
+                viewBox="0 0 12 12"
+                aria-hidden="true"
+                focusable="false"
+              >
                 <path d="M6 1v10M1 6h10" />
               </svg>
             </button>
